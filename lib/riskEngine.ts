@@ -15,7 +15,7 @@ export interface MLInferenceResult {
   xaiFactors: XAIFactor[];
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8005";
 
 export async function checkMLServiceStatus(): Promise<boolean> {
   try {
