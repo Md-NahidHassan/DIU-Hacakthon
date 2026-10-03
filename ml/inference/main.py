@@ -43,6 +43,14 @@ try:
     with open(os.path.join(graph_dir, "metadata.json")) as f:
         meta["network"] = json.load(f)["version"]
         
+    # Keep raw metadata for metrics endpoint
+    with open(os.path.join(fraud_dir, "metadata.json")) as f:
+        meta["fraud_raw"] = json.load(f)
+    with open(os.path.join(anomaly_dir, "metadata.json")) as f:
+        meta["anomaly_raw"] = json.load(f)
+    with open(os.path.join(graph_dir, "metadata.json")) as f:
+        meta["network_raw"] = json.load(f)
+        
     # Setup SHAP explainer
     explainer = shap.TreeExplainer(fraud_model)
 except Exception as e:
@@ -69,6 +77,14 @@ def health():
             "network": network_graph is not None,
             "shap": explainer is not None
         }
+    }
+
+@app.get("/metrics")
+def get_metrics():
+    return {
+        "fraud": meta.get("fraud_raw", {}),
+        "anomaly": meta.get("anomaly_raw", {}),
+        "network": meta.get("network_raw", {})
     }
 
 def prepare_fraud_features(tx: TransactionInput):

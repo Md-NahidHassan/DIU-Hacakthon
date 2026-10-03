@@ -3,11 +3,12 @@
 import { useState } from "react";
 import IntelligenceDashboard from "@/components/IntelligenceDashboard";
 import OperationsQueue from "@/components/OperationsQueue";
+import CommandCenter from "@/components/CommandCenter";
 import { CasesProvider } from "@/lib/casesStore";
-import { Activity, LayoutDashboard, Shield } from "lucide-react";
+import { Activity, LayoutDashboard, Shield, BarChart3 } from "lucide-react";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<"SIMULATOR" | "OPERATIONS">("SIMULATOR");
+  const [activeTab, setActiveTab] = useState<"SIMULATOR" | "OPERATIONS" | "COMMAND_CENTER">("SIMULATOR");
 
   return (
     <CasesProvider>
@@ -26,10 +27,17 @@ export default function Dashboard() {
           >
             <Shield className="w-4 h-4" /> Risk Operations & Cases
           </button>
+          <button 
+            onClick={() => setActiveTab("COMMAND_CENTER")}
+            className={`flex items-center gap-2 px-6 py-4 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'COMMAND_CENTER' ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+          >
+            <BarChart3 className="w-4 h-4" /> Risk Command Center
+          </button>
         </div>
 
         {activeTab === "SIMULATOR" && <IntelligenceDashboard onNavigateToOps={() => setActiveTab("OPERATIONS")} />}
         {activeTab === "OPERATIONS" && <OperationsQueue />}
+        {activeTab === "COMMAND_CENTER" && <CommandCenter />}
       </div>
     </CasesProvider>
   );
