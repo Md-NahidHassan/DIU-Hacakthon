@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, Search, ShieldCheck, Clock, CheckCircle2, ShieldAlert, AlertTriangle, Activity, Share2, Target, FileText, ChevronDown, Check } from "lucide-react";
 import { TransactionInput } from "@/lib/types";
 import { MLInferenceResult } from "@/lib/riskEngine";
+import { useCases } from "@/lib/casesStore";
 import XAIFactors from "./XAIFactors";
 import NetworkGraph from "./NetworkGraph";
 
@@ -12,24 +13,21 @@ interface InvestigationDrawerProps {
   onClose: () => void;
   tx: TransactionInput;
   riskOutput: MLInferenceResult | null;
+  onCreateCase?: () => void;
 }
 
-export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput }: InvestigationDrawerProps) {
+export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput, onCreateCase }: InvestigationDrawerProps) {
   const [timestamp, setTimestamp] = useState("");
   const [status, setStatus] = useState("NEW");
   const [disposition, setDisposition] = useState("");
   const [notes, setNotes] = useState("");
   const [isWhyActionOpen, setIsWhyActionOpen] = useState(false);
 
+  const { addCase } = useCases();
+
   useEffect(() => {
     if (isOpen) {
       setTimestamp(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-      setStatus("UNDER REVIEW"); // Auto transition to under review
-    } else {
-      setStatus("NEW");
-      setDisposition("");
-      setNotes("");
-      setIsWhyActionOpen(false);
     }
   }, [isOpen]);
 
@@ -329,48 +327,40 @@ export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput }:
             </div>
           </section>
 
-          {/* 5. WORKFLOW DISPOSITION (LOCAL APP STATE ONLY) */}
-          <section className="bg-slate-100 rounded-xl p-5 border border-slate-200 shadow-inner">
-            <h3 className="text-sm font-bold text-slate-800 tracking-widest uppercase mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-slate-500" /> Analyst Investigation Form
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Current Status</label>
-                <div className="flex gap-2">
-                  {["NEW", "UNDER REVIEW", "ESCALATED", "RESOLVED"].map(s => (
-                    <button key={s} onClick={() => setStatus(s)} className={`px-3 py-1.5 rounded text-xs font-bold transition-colors ${status === s ? 'bg-blue-600 text-white shadow' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'}`}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mt-5 mb-2">Analyst Disposition</label>
-                <select value={disposition} onChange={(e) => setDisposition(e.target.value)} className="w-full bg-white border border-slate-300 text-slate-700 rounded p-2 text-sm font-medium focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none">
-                  <option value="">-- Select Decision --</option>
-                  <option value="NO_ACTION">No Action Required / Cleared</option>
-                  <option value="FALSE_POSITIVE">Confirmed False Positive</option>
-                  <option value="ESCALATED_L2">Escalated to L2 Risk Team</option>
-                  <option value="CONFIRMED_SUSPICIOUS">Confirmed Suspicious / Block</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Analyst Notes</label>
-                <textarea 
-                  value={notes} 
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Type investigation notes here..." 
-                  className="w-full bg-white border border-slate-300 rounded p-3 text-sm h-[100px] text-slate-700 resize-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                />
-                <div className="text-right mt-2">
-                  <button className="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider py-2 px-4 rounded shadow transition-colors">
-                    Save Record
-                  </button>
-                </div>
-              </div>
+          {/* 5. CREATE CASE WORKFLOW */}
+          <section className="bg-slate-100 rounded-xl p-5 border border-slate-200 shadow-inner flex flex-col sm:flex-row items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800 tracking-widest uppercase flex items-center gap-2 mb-1">
+                <FileText className="w-4 h-4 text-slate-500" /> Operationalize Risk
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">Create a tracking case to assign an analyst, review evidence, and record disposition outcome.</p>
             </div>
+            
+            <button 
+              onClick={() => {
+                addCase({
+                  caseId: `CASE-${Math.floor(1000 + Math.random() * 9000)}`,
+                  transaction: tx,
+                  riskAssessment: riskOutput,
+                  status: "NEW",
+                  assignedTo: "",
+                  notes: [],
+                  disposition: "",
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  auditEvents: [{
+                    id: Math.random().toString(),
+                    action: "Investigation opened and case created",
+                    actor: "System",
+                    timestamp: new Date().toISOString()
+                  }]
+                });
+                onCreateCase?.();
+              }}
+              className="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-lg shadow-sm transition-colors whitespace-nowrap"
+            >
+              + Create Case
+            </button>
           </section>
 
         </div>

@@ -19,7 +19,7 @@ const PRESETS = {
   MULE: { amount: 42000, type: "SEND_MONEY" as const, hourOfDay: 2, isNewDevice: true, isUnusualLocation: true, accountAgeDays: 18, receiverIsNew: true, transactionVelocity: 25 }
 };
 
-export default function IntelligenceDashboard() {
+export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateToOps?: () => void }) {
   const [txInput, setTxInput] = useState<TransactionInput>({
     senderAccount: "AC••••1234",
     receiverAccount: "AC••••5678",
@@ -226,7 +226,11 @@ export default function IntelligenceDashboard() {
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)} 
         tx={txInput} 
-        riskOutput={riskOutput as any} // we cast this because the structural types in typescript might differ if we changed them, though we didn't significantly
+        riskOutput={riskOutput as any}
+        onCreateCase={() => {
+          setIsDrawerOpen(false);
+          onNavigateToOps?.();
+        }}
       />
     </div>
   );
