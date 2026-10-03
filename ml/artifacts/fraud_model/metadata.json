@@ -1,0 +1,20 @@
+{
+  "model_name": "XGBoost Fraud Classifier",
+  "version": "xgb-v1",
+  "features": [
+    "amount",
+    "hour_of_day",
+    "account_age_days",
+    "is_new_device",
+    "is_unusual_location",
+    "receiver_is_new",
+    "transaction_velocity",
+    "device_age_days",
+    "type_CASH_OUT",
+    "type_MERCHANT_PAY",
+    "type_SEND_MONEY"
+  ],
+  "metrics": {
+    "roc_auc": 0.9999984217171717
+  }
+}
