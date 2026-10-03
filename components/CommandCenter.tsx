@@ -14,9 +14,10 @@ export default function CommandCenter() {
     let active = true;
     const fetchSystemData = async () => {
       try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
         const [hRes, mRes] = await Promise.all([
-          fetch("http://localhost:8000/health").catch(() => null),
-          fetch("http://localhost:8000/metrics").catch(() => null)
+          fetch(`${API_BASE_URL}/health`).catch(() => null),
+          fetch(`${API_BASE_URL}/metrics`).catch(() => null)
         ]);
 
         if (!active) return;

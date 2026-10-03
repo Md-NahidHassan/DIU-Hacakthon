@@ -15,9 +15,11 @@ export interface MLInferenceResult {
   xaiFactors: XAIFactor[];
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export async function checkMLServiceStatus(): Promise<boolean> {
   try {
-    const res = await fetch("http://localhost:8000/health", { method: 'GET' });
+    const res = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });
     return res.ok;
   } catch (error) {
     return false;
@@ -26,7 +28,7 @@ export async function checkMLServiceStatus(): Promise<boolean> {
 
 export async function analyzeTransaction(input: TransactionInput): Promise<MLInferenceResult | null> {
   try {
-    const res = await fetch("http://localhost:8000/analyze", {
+    const res = await fetch(`${API_BASE_URL}/analyze`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
