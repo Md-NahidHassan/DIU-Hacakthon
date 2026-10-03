@@ -98,6 +98,7 @@ def prepare_fraud_features(tx: TransactionInput):
         "receiver_is_new": int(tx.receiverIsNew),
         "transaction_velocity": tx.transactionVelocity,
         "device_age_days": tx.deviceAgeDays if not tx.isNewDevice else 0,
+        "type_CASH_OUT": 1 if tx.type == "CASH_OUT" else 0,
         "type_MERCHANT_PAY": 1 if tx.type == "MERCHANT_PAY" else 0,
         "type_SEND_MONEY": 1 if tx.type == "SEND_MONEY" else 0
     }])
