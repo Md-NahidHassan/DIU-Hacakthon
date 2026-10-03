@@ -5,3 +5,6 @@ xgboost
 networkx
 shap
 joblib
+fastapi
+uvicorn
+pydantic
