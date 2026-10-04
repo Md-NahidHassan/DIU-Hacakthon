@@ -5,7 +5,8 @@
 ---
 
 ## 🔗 Live Deployment URL
-**Live Demo:** [https://diu-hacakthonmababardoua.vercel.app/](https://diu-hacakthonmababardoua.vercel.app/)
+**Frontend UI (Vercel):** [https://diu-hacakthonmababardoua.vercel.app/](https://diu-hacakthonmababardoua.vercel.app/)
+**Backend API (Render):** [https://upayshield-api.onrender.com/health](https://upayshield-api.onrender.com/health)
 *(Note: As the backend is hosted on a free Render tier, the first API request may take up to 50 seconds to wake up the server. Please be patient during the first test.)*
 
 ---
