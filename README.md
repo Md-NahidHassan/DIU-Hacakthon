@@ -27,7 +27,64 @@ A unified intelligence platform that fuses supervised and unsupervised machine l
 Modern threats evolve faster than static rules can adapt. AI/ML enables the platform to detect subtle behavioral deviations (unsupervised learning) and recognize historically complex fraud patterns (supervised learning) across massive volumes of synthetic transaction data, surfacing priority cases instantly.
 
 ## 5. Architecture
-The prototype architecture is decoupled and designed for future integration via APIs:
+The prototype architecture is decoupled and designed for future integration via APIs.
+
+```mermaid
+graph TD
+    %% Define Styles
+    classDef user fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px;
+    classDef upayApp fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px;
+    classDef core fill:#ede7f6,stroke:#673ab7,stroke-width:2px;
+    classDef mlApi fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef models fill:#f1f8e9,stroke:#8bc34a,stroke-width:1px,stroke-dasharray: 5 5;
+    classDef admin fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
+
+    %% Nodes
+    User(("🧑 Customer")):::user
+    App["📱 Upay Mobile App<br>(Initiates Transaction)"]:::upayApp
+    Core["⚙️ Upay Core Server<br>(Transaction Processing)"]:::core
+    
+    subgraph "Upay Shield Core Engine (Python/FastAPI)"
+        API["📡 Upay Shield ML API"]:::mlApi
+        Fraud["XGBoost Fraud Model"]:::models
+        Anomaly["Isolation Forest Anomaly"]:::models
+        Graph["Network Risk Engine"]:::models
+        Fusion["Risk Fusion & SHAP (XAI)"]:::models
+        API --> Fraud & Anomaly & Graph --> Fusion
+    end
+
+    subgraph "Automated Enforcement (Policy)"
+        LowRisk["🟢 LOW Risk: Auto Approve"]:::mlApi
+        ModRisk["🟡 MODERATE Risk: OTP / FaceID"]:::admin
+        CritRisk["🔴 CRITICAL Risk: Block & Escalate"]:::admin
+    end
+
+    subgraph "Trust & Risk Operations (Next.js)"
+        Dashboard["💻 upay Shield Dashboard<br>(React/Next.js)"]:::admin
+        Analyst(("🕵️ Fraud Analyst")):::user
+    end
+
+    %% Connections
+    User -- "Send Money / Cash Out" --> App
+    App -- "Transaction Request" --> Core
+    Core -- "1. API Request (Analyze)" --> API
+    Fusion -- "2. Risk Score & Explainability" --> Core
+    
+    Core -- "If Risk is LOW" --> LowRisk
+    LowRisk -- "Success" --> App
+    
+    Core -- "If Risk is MODERATE" --> ModRisk
+    ModRisk -- "Verification" --> App
+    
+    Core -- "If Risk is CRITICAL" --> CritRisk
+    CritRisk -- "Alert & Evidence" --> Dashboard
+    
+    Dashboard -- "Queue/Timeline/XAI" --> Analyst
+    Analyst -- "Investigate & Decide (Approve/Block)" --> Dashboard
+    Dashboard -- "Final Action Webhook" --> Core
+```
+
+**Workflow Summary:**
 **Next.js Frontend UI** ⇆ REST API ⇆ **Python/FastAPI ML Backend** 
 
 ## 6. ML Models (Risk Fusion)
