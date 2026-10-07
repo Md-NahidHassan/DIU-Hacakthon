@@ -34,56 +34,69 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
   const [isLoading, setIsLoading] = useState(false);
   const [metrics, setMetrics] = useState<any>(null);
 
+  const [hasNewChanges, setHasNewChanges] = useState(true);
+  const [scenarioState, setScenarioState] = useState("");
+
+  const fetchRisk = async () => {
+    setIsLoading(true);
+    setScenarioState("AI analyzing...");
+    const output = await analyzeTransaction(txInput);
+    if (output) {
+      setRiskOutput(output);
+      setIsOffline(false);
+      setHasNewChanges(false);
+      setScenarioState("Analysis Complete");
+      setTimeout(() => setScenarioState(""), 3000);
+    } else {
+      setRiskOutput(null);
+      setIsOffline(true);
+      setScenarioState("Service Unavailable");
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     let active = true;
-    const fetchRisk = async () => {
-      setIsLoading(true);
-      const output = await analyzeTransaction(txInput);
-      if (!active) return;
-      if (output) {
-        setRiskOutput(output);
-        setIsOffline(false);
-      } else {
-        setRiskOutput(null);
-        setIsOffline(true);
-      }
-      setIsLoading(false);
-    };
-
     const loadMetrics = async () => {
       const data = await fetchMetrics();
       if (active && data) setMetrics(data);
     };
     loadMetrics();
     
-    // Add small debounce to avoid spamming the backend while dragging sliders
-    const timeoutId = setTimeout(() => {
-      fetchRisk();
-    }, 300);
-    
     return () => {
       active = false;
-      clearTimeout(timeoutId);
     };
-  }, [txInput]);
+  }, []);
 
   const handleInputChange = (field: keyof TransactionInput, value: any) => {
     setTxInput(prev => ({ ...prev, [field]: value }));
+    setHasNewChanges(true);
   };
 
   const loadPreset = (presetKey: keyof typeof PRESETS) => {
     setTxInput(prev => ({ ...prev, ...PRESETS[presetKey] }));
+    setHasNewChanges(true);
+    setScenarioState(`Loaded: ${presetKey} preset`);
+    setTimeout(() => {
+      fetchRisk(); // auto-run for presets to make demo fast as requested: "When a preset is selected... Run the existing ML inference"
+    }, 500);
   };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-in-out pb-10">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-semibold text-slate-800 flex items-center gap-2">
-          <LayoutDashboard className="h-6 w-6 text-blue-600" />
-          Intelligence Dashboard
-        </h2>
-        <div className="text-sm text-slate-500 font-medium">
-          AI-generated risk assessment
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-800 flex items-center gap-2">
+            <LayoutDashboard className="h-6 w-6 text-blue-600" />
+            Intelligence Dashboard
+          </h2>
+          <div className="text-sm text-slate-500 font-medium mt-1">
+            AI-assisted Decision Support • Human Oversight Required
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <span className="px-2 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-bold tracking-wider rounded uppercase">Synthetic Data Only</span>
+          <span className="px-2 py-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold tracking-wider rounded uppercase">Privacy-first Prototype</span>
         </div>
       </div>
 
@@ -117,13 +130,18 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
           {/* Simulator */}
           <section className="glass-card rounded-xl p-6 border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <SlidersHorizontal className="h-5 w-5 text-blue-500" />
-                Transaction Simulator
-              </h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                  <SlidersHorizontal className="h-5 w-5 text-blue-500" />
+                  Transaction Simulator
+                </h3>
+                {scenarioState && (
+                  <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100 uppercase tracking-widest animate-in fade-in zoom-in">{scenarioState}</span>
+                )}
+              </div>
               <div className="flex space-x-2">
-                <button onClick={() => loadPreset("NORMAL")} className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">NORMAL SEND MONEY</button>
-                <button onClick={() => loadPreset("SIM_SWAP")} className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">MIDNIGHT SIM-SWAP</button>
+                <button onClick={() => loadPreset("NORMAL")} className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">NORMAL</button>
+                <button onClick={() => loadPreset("SIM_SWAP")} className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">ATO / SIM-SWAP</button>
                 <button onClick={() => loadPreset("MULE")} className="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition">MULE NETWORK</button>
               </div>
             </div>
@@ -168,6 +186,18 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
                 </label>
               </div>
             </div>
+
+            {hasNewChanges && (
+              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                <button
+                  onClick={fetchRisk}
+                  disabled={isLoading}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-bold shadow-sm transition-colors flex items-center gap-2"
+                >
+                  <Search className="w-5 h-5"/> Analyze Transaction
+                </button>
+              </div>
+            )}
           </section>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -189,47 +219,65 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
             </div>
           )}
 
-          {/* Model Output (Phase 3G & 3H) */}
+          {/* Empty State when no analysis */}
+          {!isOffline && !riskOutput && !isLoading && (
+            <div className="p-8 bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center justify-center text-center space-y-4 shadow-sm h-64">
+              <div className="p-4 bg-white rounded-full shadow-sm"><Search className="w-8 h-8 text-blue-500" /></div>
+              <h3 className="font-bold text-slate-800 tracking-tight text-lg">Ready to Analyze</h3>
+              <p className="text-sm text-slate-500 max-w-xs">Adjust the simulator parameters or select a preset scenario, then click &quot;Analyze Transaction&quot; to evaluate risk.</p>
+              <button onClick={fetchRisk} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-blue-700 transition">Analyze Current Config</button>
+            </div>
+          )}
+
+          {/* Model Output Re-ordered for Visual Hierarchy */}
           {!isOffline && riskOutput && (
             <section className={`glass-card rounded-xl p-6 border border-slate-200 flex flex-col overflow-hidden transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-              <div className="flex flex-col mb-6 space-y-3">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Model Output</h3>
-                
-                <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-sm font-medium text-slate-600">Fraud Probability</span>
-                  <span className="font-bold text-slate-800">{riskOutput.fraudProbability}%</span>
-                </div>
-                
-                <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-sm font-medium text-slate-600">Behavior Anomaly Score</span>
-                  <span className="font-bold text-slate-800">{riskOutput.anomalyScore}/100</span>
-                </div>
-
-                <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-sm font-medium text-slate-600">Network Risk Score</span>
-                  <span className="font-bold text-slate-800">{riskOutput.networkRiskScore}/100</span>
-                </div>
-              </div>
-
-              <div className="flex justify-center border-t border-slate-100 pt-6">
+              
+              {/* PRIMARY FOCUS: RISK SCORE */}
+              <div className="flex justify-center mb-6">
                 <RiskScore score={riskOutput.finalRiskScore} level={riskOutput.riskLevel} />
               </div>
-              
+
+              {/* SECONDARY FOCUS: RECOMMENDATION */}
+              <div className="mb-6 border-b border-slate-100 pb-6">
+                <RecommendationCard action={riskOutput.recommendedAction} />
+              </div>
+
+              {/* EXPLANATION */}
               <XAIFactors factors={riskOutput.xaiFactors} />
+
+              {/* ML SUBSCORES */}
+              <div className="flex flex-col mt-6 pt-6 border-t border-slate-100 space-y-3">
+                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center mb-1">Underlying AI Signals</h3>
+                
+                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <span className="text-sm font-medium text-slate-600">Fraud Probability</span>
+                  <span className={`font-bold ${riskOutput.fraudProbability > 75 ? 'text-red-600' : 'text-slate-800'}`}>{riskOutput.fraudProbability}%</span>
+                </div>
+                
+                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <span className="text-sm font-medium text-slate-600">Behavior Anomaly Score</span>
+                  <span className={`font-bold ${riskOutput.anomalyScore > 75 ? 'text-red-600' : 'text-slate-800'}`}>{riskOutput.anomalyScore}/100</span>
+                </div>
+
+                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <span className="text-sm font-medium text-slate-600">Network Risk Score</span>
+                  <span className={`font-bold ${riskOutput.networkRiskScore > 75 ? 'text-red-600' : 'text-slate-800'}`}>{riskOutput.networkRiskScore}/100</span>
+                </div>
+              </div>
             </section>
           )}
 
-          {/* Recommended Action */}
+          {/* INVESTIGATION CTA */}
           {!isOffline && riskOutput && (
-            <div className={`animate-in fade-in duration-500 relative transition-opacity ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
-              <RecommendationCard action={riskOutput.recommendedAction} />
-              
-              {riskOutput.riskLevel !== "LOW" && (
-                <button onClick={() => setIsDrawerOpen(true)} className="w-full mt-3 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow flex items-center justify-center gap-2 transition-colors">
-                  <Search className="w-4 h-4" />
-                  Investigate Details
-                </button>
-              )}
+            <div className="mt-6">
+              <button 
+                onClick={() => setIsDrawerOpen(true)} 
+                className="w-full py-4 bg-slate-800 hover:bg-slate-900 border border-slate-900 shadow-xl transition-all text-white font-bold rounded-xl flex items-center justify-center gap-2 group transform hover:-translate-y-0.5"
+              >
+                <Search className="w-5 h-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
+                Open Investigation
+              </button>
             </div>
           )}
         </div>

@@ -95,51 +95,66 @@ export default function OperationsQueue() {
       <div className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 px-4">
+            <thead className="bg-slate-50 px-4 border-b border-slate-200">
               <tr>
-                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Case ID</th>
-                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Risk</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Time & ID</th>
                 <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Transaction</th>
-                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Owner</th>
-                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Action</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Risk Level & Score</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Primary Risk Signal</th>
+                <th className="p-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Action / Owner</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredCases.map(c => (
-                <tr key={c.caseId} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4 font-bold text-slate-700 whitespace-nowrap">
-                    {c.caseId}<br/>
-                    <span className="text-[10px] text-slate-400 font-medium">UPY-****-{c.transaction.senderAccount.substring(6)}</span>
-                  </td>
-                  <td className="p-4">
-                    <div className={`font-bold ${c.riskAssessment.riskLevel === 'CRITICAL' ? 'text-red-600' : 'text-amber-600'}`}>
-                      {c.riskAssessment.finalRiskScore}%
-                    </div>
-                    <div className="text-[10px] text-slate-500 uppercase mt-0.5">{c.riskAssessment.riskLevel}</div>
-                  </td>
-                  <td className="p-4 whitespace-nowrap">
-                    <div className="font-bold text-slate-700">৳{c.transaction.amount.toLocaleString()}</div>
-                    <div className="text-[10px] text-slate-500 font-medium mt-0.5">{c.transaction.type.replace(/_/g, " ")}</div>
-                  </td>
-                  <td className="p-4">
-                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase rounded border border-slate-200">
-                      {c.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">
-                    {c.assignedTo || "Unassigned"}
-                  </td>
-                  <td className="p-4 text-right">
-                    <button 
-                      onClick={() => setSelectedCaseId(c.caseId)}
-                      className="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs rounded transition-colors whitespace-nowrap border border-blue-200"
-                    >
-                      Investigate
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredCases.map(c => {
+                const isCritical = c.riskAssessment.riskLevel === 'CRITICAL';
+                const isModerate = c.riskAssessment.riskLevel === 'MODERATE';
+                const isLow = c.riskAssessment.riskLevel === 'LOW';
+                
+                const badgeColor = isCritical ? 'bg-red-100 text-red-700 border-red-200' 
+                                 : isModerate ? 'bg-amber-100 text-amber-700 border-amber-200' 
+                                 : 'bg-green-100 text-green-700 border-green-200';
+
+                const primarySignal = c.riskAssessment.xaiFactors.find(f => f.direction === 'POSITIVE')?.label || 'Consistent baseline';
+                
+                return (
+                  <tr key={c.caseId} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-4 whitespace-nowrap">
+                      <div className="font-bold text-slate-700">{c.transaction.hourOfDay.toString().padStart(2, '0')}:12</div>
+                      <div className="text-[10px] text-slate-400 font-medium font-mono uppercase mt-0.5">{c.caseId}</div>
+                    </td>
+                    <td className="p-4 whitespace-nowrap">
+                      <div className="font-bold text-slate-800">৳{c.transaction.amount.toLocaleString()}</div>
+                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">{c.transaction.type.replace(/_/g, " ")}</div>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded border ${badgeColor}`}>
+                          {c.riskAssessment.riskLevel}
+                        </span>
+                        <div className={`font-bold ${isCritical ? 'text-red-600' : isModerate ? 'text-amber-600' : 'text-green-600'}`}>
+                          {c.riskAssessment.finalRiskScore}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="text-xs text-slate-600 font-medium">
+                        {primarySignal}
+                      </div>
+                    </td>
+                    <td className="p-4 text-right flex flex-col items-end gap-1.5">
+                      <button 
+                        onClick={() => setSelectedCaseId(c.caseId)}
+                        className={`px-3 py-1.5 bg-white shadow-sm font-bold text-xs rounded transition-colors whitespace-nowrap border ${isCritical ? 'text-red-700 border-red-200 hover:bg-red-50' : 'text-blue-700 border-blue-200 hover:bg-blue-50'}`}
+                      >
+                        {isCritical ? "Escalate & Review" : "Investigate"}
+                      </button>
+                      <div className="text-[10px] font-medium text-slate-400">
+                        {c.assignedTo || "Unassigned"} • <span className="uppercase text-slate-500">{c.status}</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               {filteredCases.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-slate-500 text-sm">

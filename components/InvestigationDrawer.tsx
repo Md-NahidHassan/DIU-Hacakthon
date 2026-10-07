@@ -294,11 +294,13 @@ export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput, o
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
                   <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Investigation Timeline</h4>
                   <div className="space-y-3 text-xs font-medium text-slate-500 relative before:absolute before:inset-y-1 before:left-1.5 before:w-px before:bg-slate-200">
-                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-slate-300 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Transaction received</div></div>
-                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-blue-400 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> ML risk analysis completed</div></div>
-                    {riskOutput.riskLevel !== 'LOW' && (
-                      <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-red-400 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Risk classified as {riskOutput.riskLevel}</div></div>
-                    )}
+                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-slate-300 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Transaction Detected</div></div>
+                    {riskOutput.anomalyScore > 60 && <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-amber-300 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Behavior Anomaly Detected</div></div>}
+                    {riskOutput.networkRiskScore > 60 && <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-amber-300 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Network Risk Identified</div></div>}
+                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-blue-400 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> AI Risk Score Generated</div></div>
+                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-indigo-400 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> XAI Explanation Generated</div></div>
+                    <div className="flex gap-3 relative z-10"><div className="w-3 h-3 bg-white border-2 border-slate-400 rounded-full shrink-0" /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Investigation Opened</div></div>
+                    <div className="flex gap-3 relative z-10"><div className={`w-3 h-3 bg-white border-2 rounded-full shrink-0 ${riskOutput.riskLevel === 'CRITICAL' ? 'border-red-500' : 'border-amber-500'}`} /><div><span className="font-bold text-slate-400 w-16 inline-block">{timestamp}</span> Recommended Action</div></div>
                   </div>
                 </div>
 

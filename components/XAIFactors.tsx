@@ -6,6 +6,15 @@ import { XAIFactor } from "@/lib/types";
 export default function XAIFactors({ factors }: { factors: XAIFactor[] }) {
   if (!factors || factors.length === 0) return null;
 
+  const summaryFeatures = factors
+    .filter(f => f.direction === "POSITIVE")
+    .map(f => f.label.toLowerCase())
+    .slice(0, 3);
+  
+  const explanation = summaryFeatures.length > 0 
+    ? `Risk increased because the transaction exhibited anomalous patterns in ${summaryFeatures.join(", and ")}.`
+    : `Transaction behavior aligns with established baseline profiles, contributing to a lower risk score.`;
+
   return (
     <div className="w-full mt-6 text-left">
       <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
@@ -31,12 +40,12 @@ export default function XAIFactors({ factors }: { factors: XAIFactor[] }) {
                   style={{ width: `${Math.min(factor.weight, 100)}%` }}
                 />
               </div>
-              <p className="text-xs text-slate-400 hidden group-hover:block transition-all duration-300">
-                {factor.explanation}
-              </p>
             </div>
           );
         })}
+      </div>
+      <div className="mt-4 p-3 bg-slate-50 border border-slate-100 rounded-lg text-xs leading-relaxed text-slate-600 font-medium italic">
+        {explanation}
       </div>
     </div>
   );

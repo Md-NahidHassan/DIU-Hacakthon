@@ -21,7 +21,7 @@ export default function RecommendationCard({ action }: { action: RecommendedActi
       icon: <ShieldAlert className="w-5 h-5 text-red-600 mt-0.5" />,
       title: "BLOCK & ESCALATE",
       titleColor: "text-red-700",
-      reason: "Multiple high-risk behavioral signals detected. Operator review required.",
+      reason: "Escalate for human review",
     };
   } else if (action === "CHALLENGE_OTP_BIOMETRIC") {
     config = {
@@ -30,30 +30,31 @@ export default function RecommendationCard({ action }: { action: RecommendedActi
       icon: <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />,
       title: "CHALLENGE (OTP / BIOMETRIC)",
       titleColor: "text-amber-700",
-      reason: "Moderate risk signals detected. Verify user identity before proceeding.",
+      reason: "Challenge customer / verify identity",
     };
+  } else {
+    config.reason = "Auto-approve";
   }
 
   return (
-    <div className={`w-full rounded-xl border p-4 ${config.bg} ${config.border} flex flex-col space-y-3 shadow-sm transition-all duration-300`}>
-      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Recommended Action</h3>
-      
-      <div className="flex items-start space-x-3">
-        {config.icon}
-        <div>
-          <h4 className={`text-lg font-bold tracking-tight ${config.titleColor}`}>
-            {config.title}
-          </h4>
-          <p className="text-sm text-slate-600 mt-1">
-            Reason: <br className="sm:hidden" />
-            <span className="font-medium">{config.reason}</span>
-          </p>
-          {action !== "AUTO_APPROVE" && (
-            <p className="text-xs text-slate-500 mt-2 italic flex items-center gap-1">
-              * Human oversight remains important.
+    <div className={`w-full flex flex-col space-y-2`}>
+      <div className={`w-full rounded-xl border p-4 ${config.bg} ${config.border} flex flex-col space-y-3 shadow-sm transition-all duration-300`}>
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Recommended Action</h3>
+        
+        <div className="flex items-start space-x-3">
+          {config.icon}
+          <div>
+            <h4 className={`text-lg font-bold tracking-tight ${config.titleColor}`}>
+              {config.title}
+            </h4>
+            <p className="text-sm text-slate-600 mt-1 font-medium pb-1">
+              {config.reason}
             </p>
-          )}
+          </div>
         </div>
+      </div>
+      <div className="text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest mt-2 border border-slate-200 bg-slate-50 rounded-lg py-1.5 px-3">
+        AI-assisted decision support <span className="mx-1">•</span> Human review required for consequential actions
       </div>
     </div>
   );
