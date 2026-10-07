@@ -34,12 +34,20 @@ export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput, o
   if (!isOpen || !riskOutput) return null;
 
   // Derivations for narratives based on output
-  let narrative = "Transaction appears normal, indicating established behavioral patterns. No immediate action required.";
+  let aiAssessment = "Transaction behavior aligns with established profiles. No immediate manual intervention signals generated.";
   if (riskOutput.riskLevel === "CRITICAL") {
-    narrative = `The transaction shows elevated risk due to a significant combination of factors including ${riskOutput.xaiFactors.map(f => f.label.toLowerCase()).slice(0,2).join(" and ")}. Network analysis also indicates elevated interaction patterns.\n\nRecommended next step:\nHuman review and escalation.`;
+    aiAssessment = `Transaction exhibits multiple clustered risk signals indicating potentially unauthorized activity or significant behavioral deviation.`;
   } else if (riskOutput.riskLevel === "MODERATE") {
-    narrative = "The transaction presents moderate risk signals, indicating slight behavioral deviations. Verify user authenticity before proceeding.";
+    aiAssessment = "Initial signals reflect moderate risk deviations. Secondary verification recommended before proceeding.";
   }
+
+  const evidencePoints = [];
+  if (tx.isNewDevice) evidencePoints.push("Transaction from a newly observed device");
+  if (tx.isUnusualLocation) evidencePoints.push("Geographic location deviates from user baseline");
+  if (tx.receiverIsNew) evidencePoints.push("Recipient account has no prior transaction history with sender");
+  if (tx.amount > 15000) evidencePoints.push("Transaction amount exceeds typical user thresholds");
+  if ((tx.transactionVelocity ?? 0) > 10) evidencePoints.push("High velocity of transactions within a short temporal window");
+  if (riskOutput.networkRiskScore > 60) evidencePoints.push("Graph analysis indicates interaction with suspicious network nodes");
 
   const getActionIcon = () => {
     if (riskOutput.recommendedAction === "BLOCK_AND_ESCALATE") return <ShieldAlert className="w-5 h-5 text-red-600" />;
@@ -177,13 +185,36 @@ export default function InvestigationDrawer({ isOpen, onClose, tx, riskOutput, o
 
           {/* AI INVESTIGATION SUMMARY */}
           <section className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 shadow-sm">
-            <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-              <Search className="w-3 h-3" /> AI INVESTIGATION SUMMARY
-            </h4>
-            <div className="text-sm text-indigo-900 leading-relaxed font-medium">
-              {narrative.split("\n\n").map((para, i) => (
-                <p key={i} className={i > 0 ? "mt-3" : ""}>{para}</p>
-              ))}
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                <Search className="w-3 h-3" /> AI INVESTIGATION SUMMARY
+              </h4>
+              <span className="text-[9px] font-bold tracking-widest uppercase text-indigo-400 border border-indigo-200 bg-white px-2 py-0.5 rounded">Structured Evidence</span>
+            </div>
+            
+            <div className="space-y-4 text-sm text-indigo-900 leading-relaxed font-medium">
+              <div>
+                <span className="font-bold text-indigo-800 text-[10px] uppercase tracking-widest block mb-1">Evidence</span>
+                {evidencePoints.length > 0 ? (
+                  <ul className="list-disc pl-5 space-y-1">
+                    {evidencePoints.map((pt, i) => (
+                      <li key={i}>{pt}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>Transaction aligned with standard behavioral bounds.</p>
+                )}
+              </div>
+              
+              <div>
+                <span className="font-bold text-indigo-800 text-[10px] uppercase tracking-widest block mb-1">AI Assessment</span>
+                <p>{aiAssessment}</p>
+              </div>
+
+              <div>
+                <span className="font-bold text-indigo-800 text-[10px] uppercase tracking-widest block mb-1">Recommended Action</span>
+                <p className="font-bold">{getActionTitle()}</p>
+              </div>
             </div>
           </section>
 

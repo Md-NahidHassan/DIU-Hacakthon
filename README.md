@@ -2,6 +2,9 @@
 
 *Track 01: Trust & Risk Intelligence | Team: Ma Babar Doua (Nahid, Farhan, Rakib)*
 
+upay Shield turns transaction risk signals into explainable, investigation-ready intelligence.
+**Detect the risk. Understand why. Investigate the evidence. Decide with confidence.**
+
 ---
 
 ## 🔗 Live Deployment URL
@@ -11,142 +14,82 @@
 
 ---
 
-## 📖 Project Overview
+## 1. Project Overview
+upay Shield is an AI-assisted decision-support prototype designed to enhance financial Trust & Risk Operations. Rather than simply blocking transactions in a vacuum, the system provides a multi-layer view of risk and directly connects machine learning inference to human-in-the-loop investigation workflows.
 
-**The Problem:** Traditional rule-based financial security systems flag too many false positives and lack explainability (the "Black Box" problem). Analysts waste time hunting for evidence across fragmented systems during active cyber-attacks like Account Takeovers (ATO) or Mule Networks.
+## 2. Problem
+Traditional rule-based financial security systems flag too many false positives and lack explainability (the "Black Box" problem). Fraud analysts waste significant time hunting for evidence across fragmented systems during increasingly sophisticated attacks like Account Takeovers (ATO) and coordinated Mule Networks.
 
-**Proposed Solution:** A multi-layered intelligence platform called "upay Shield". It fuses supervised and unsupervised machine learning to detect fraud in real-time, completely explains its own reasoning using SHAP (Explainable AI), and pipes critical threats directly into a built-in Case Management CRM for human analysts to resolve.
+## 3. Solution
+A unified intelligence platform that fuses supervised and unsupervised machine learning to detect fraud, explains its reasoning via feature attribution, and pipes structured evidence directly into a built-in Investigation Workbench for human analysts.
 
-**Purpose:** To bridge the gap between algorithmic AI detection and human security operations, ensuring complete regulatory compliance, ethical AI practices (human-in-the-loop), and zero risk to real customer data (trained via synthetic data).
+## 4. Why AI/ML?
+Modern threats evolve faster than static rules can adapt. AI/ML enables the platform to detect subtle behavioral deviations (unsupervised learning) and recognize historically complex fraud patterns (supervised learning) across massive volumes of synthetic transaction data, surfacing priority cases instantly.
 
----
+## 5. Architecture
+The prototype architecture is decoupled and designed for future integration via APIs:
+**Next.js Frontend UI** ⇆ REST API ⇆ **Python/FastAPI ML Backend** 
 
-## ✨ Features & AI Component Usage
+## 6. ML Models (Risk Fusion)
+- **XGBoost (Supervised):** Synthetic typologies classifier identifying known transaction fraud patterns.
+- **Isolation Forest (Unsupervised):** Behavioral anomaly engine detecting unexpected deviations from a user's baseline.
+- **Graph Risk Engine:** Heuristic network risk logic analyzing velocity and counterparty connections.
 
-**Implemented Features:**
-1. **Interactive Threat Simulator:** Manually manipulate transaction variables (Amount, Time, Device) or use presets (e.g., *Midnight SIM-Swap*) to test real-time AI reactions.
-2. **Investigation Workbench:** A digital evidence drawer providing plain-English threat summaries and raw data logs.
-3. **Integrated Case Management (CMS):** A central queue where alerts are routed for analysts to assign statuses (Under Review, Escalated, Resolved).
-4. **Risk Command Center:** Executive dashboard showing AI vs. Human decision matrices and model validation metrics.
+## 7. Explainability (XAI)
+To counter the "black box" problem, upay Shield utilizes **SHAP (SHapley Additive exPlanations)**. Once a risk score is generated, the UI dynamically displays the top risk-driving factors—proving to analysts exactly *why* the AI flagged the transaction.
 
-**How AI Components Are Used:**
-- **XGBoost (Supervised):** Detects known scam typologies based on 11 trained factors.
-- **Isolation Forest (Unsupervised):** Detects "Zero-Day" unexpected anomalies by examining behavioral deviation outside the 95th percentile.
-- **Graph Risk (Heuristic):** Escalates risk for rapid velocity to unrecognizable recipients (Mule detection).
-- **SHAP (Explainable AI):** Decodes the black-box AI by assigning percentage weights to factors (e.g., "Velocity generated +13% risk"), proving reasoning to human operators.
+## 8. Investigation Workflow
+The system actively supports human oversight:
+**Transaction Detected → ML Risk Assessed → SHAP Explanation Generated → Investigation Opened → Analyst Case Review**
 
----
+## 9. Business Impact
+*Metrics represent simulated prototype estimates.*
+By gathering structured evidence and providing clear AI-assisted triage, the platform highlights the potential to significantly reduce analyst investigation time (Estimated Equivalent Hours Saved) and prioritize critical operational focus where human attention is most needed.
 
-## 🛠️ Technology Stack
+## 10. Responsible AI
+upay Shield is developed around ethical AI principles:
+- **No autonomous consequential decisions:** Financial interventions are mapped as recommendations for human review.
+- **Human-in-the-loop:** The system accelerates analysts; it does not replace them.
+- **Privacy-first approach:** Separation of inference and interface.
 
-**Frontend (Client & Analyst UI):**
-- **Framework:** Next.js (React App Router)
-- **Styling:** Tailwind CSS v4
-- **Language:** TypeScript
-- **Hosting:** Vercel
+## 11. Synthetic Data
+To ensure safety and privacy, the prototype was developed entirely on **synthetic data models**. No real customer PII or production transaction data was processed or embedded in this prototype.
 
-**Backend (ML Inference Engine):**
-- **Framework:** Python FastAPI, Uvicorn
-- **Data Manipulation:** Pandas, NumPy
-- **Machine Learning Models:** scikit-learn (Isolation Forest), XGBoost, joblib
-- **Graph/Explainable AI:** NetworkX, SHAP
-- **Hosting:** Render.com
+## 12. Demo Flow (How to Test)
+1. **Explore the Simulator:** Open the *Architecture & Ethics* tab to view the system overview, then navigate to the *Real-time Analysis Simulator*.
+2. **Trigger Scenarios:** Click the preset scenario buttons (e.g., NORMAL, ATO / SIM-SWAP). Click **"Analyze Transaction"**.
+3. **Analyze & Explain:** Observe the AI Trust Architecture in action as the Final Risk Score adjusts, SHAP visualization renders, and the structured intelligence narrative is generated.
+4. **Open Investigation:** Click the button to inspect the generated evidence chain and human review roadmap.
+5. **Review ROI:** Switch to the *Business Impact & ROI* tab to see dynamically simulated efficiency gains.
 
----
+## 13. Tech Stack
+- **Frontend UI:** Next.js (React), Tailwind CSS v4, TypeScript, Hosted on Vercel.
+- **Backend Inference API:** Python, FastAPI, Uvicorn, Hosted on Render.
+- **Data & ML Libraries:** Pandas, NumPy, scikit-learn, XGBoost, SHAP.
 
-## ⚙️ Requirements
-
-To run this project locally, ensure you have the following installed:
-- **Node.js** (v18.0.0 or higher) for the frontend.
-- **Python** (v3.9 or higher) for the ML backend.
-- **Git** (for version control).
-- Optionally, Docker if you wish to containerize the ML backend.
-
----
-
-## 🚀 Installation and Setup
-
-Complete step-by-step instructions for local setup:
-
-**1. Clone the repository:**
+## 14. Local Setup
 ```bash
+# 1. Clone
 git clone https://github.com/Md-NahidHassan/DIU-Hacakthon.git
 cd DIU-Hacakthon
-```
 
-**2. Setup Frontend:**
-```bash
+# 2. Frontend
 npm install
-```
+# Create .env.local -> NEXT_PUBLIC_API_URL=http://localhost:8005
 
-**3. Setup Python Backend:**
-```bash
+# 3. Backend (Separate terminal)
 cd ml
 pip install -r requirements.txt
-cd ..
-```
+python inference/main.py
 
----
-
-## 🔐 Environment Variables
-
-You must configure the frontend to communicate with the backend.
-Create a `.env.local` file in the root directory (Next.js root) and add the following:
-
-```env
-# Required Variable: Points the UI to the AI Inference Engine
-# Purpose: Instructs frontend fetches to use the Python backend for AI Risk Scoring
-NEXT_PUBLIC_API_URL=http://localhost:8005
-```
-
-*(Placeholder for Production: `NEXT_PUBLIC_API_URL=https://upayshield-api.onrender.com`)*
-
----
-
-## 🏃‍♂️ Run and Build Commands
-
-You need two terminal windows to run both services simultaneously.
-
-**Terminal 1: Start the ML Backend (FastAPI)**
-```bash
-# From the root directory:
-python ml/inference/main.py
-```
-*The backend will run on `http://0.0.0.0:8005`.*
-
-**Terminal 2: Start the Frontend (Next.js)**
-```bash
-# From the root directory:
+# 4. Run UI
 npm run dev
 ```
-*The frontend will run on `http://localhost:3000`.*
 
-**Build for Production (Frontend):**
-```bash
-npm run build
-npm start
-```
+## 15. Prototype Limitations
+- Operations execute completely within a synthetic data environment and display synthetic validation metrics.
+- The prototype does not evaluate production upay transaction data.
+- The system is an architectural prototype; there are no production fraud-loss prevention claims.
 
----
-
-## 🧪 Testing Instructions
-
-Follow these steps to verify implemented features and end-to-end operation:
-
-1. **Verify AI Connection:** Open `localhost:3000`. On the top right, ensure the badge says **"AI ENGINE ONLINE"**.
-2. **Trigger an Attack:** On the `Real-time Analysis Simulator` tab, click the **"MIDNIGHT SIM-SWAP"** preset button.
-3. **Observe Fusion & SHAP:** Look at the right panel. The Final Risk Score will jump to **CRITICAL**. Below it, the **SHAP Factors** (Explainable AI) will list exactly *why* (e.g., Amount and Velocity percentages).
-4. **Human Escalation:** Click the yellow **"Investigate Details"** button. The Investigation Drawer will open with the AI summary. Scroll to the bottom and click the **"+ Create Case"** button.
-5. **Analyst Resolution:** Navigate to the top **"Risk Operations & Cases"** tab. You'll see the new case in the Queue. Click **Investigate**, set the status to **"Resolved"**, insert analyst notes, and click **Save Decision**.
-6. **Executive Matrix:** Navigate to the **"Risk Command Center"** tab and verify the "AI Prediction vs Human Decision Matrix" has updated with your manual feedback.
-
----
-
-## 🔧 Other Configuration
-
-- **ML Models & Artifacts:** Built `.joblib` models are version-controlled inside the `/ml/artifacts/` folder. 
-- **Synthetic Data Regeneration:** If you wish to retrain or inspect data generation, run:
-  ```bash
-  python ml/data/generate_synthetic_data.py
-  ```
-- **CORS Requirements:** The backend `main.py` utilizes wildcard `allow_origins=["*"]` with `allow_credentials=False` for testing mobility. In strict production domains, this should be hardened to specify exact Vercel URLs.
+## 16. Future Validation Path
+**Current:** Synthetic Validation → **Next:** Controlled Historical Validation with Approved Data → **Pilot:** Human-Reviewed Shadow Mode → **Goal:** Monitored Integration with Operational Controls
