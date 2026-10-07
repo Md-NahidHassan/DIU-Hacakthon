@@ -4,11 +4,12 @@ import { useState } from "react";
 import IntelligenceDashboard from "@/components/IntelligenceDashboard";
 import OperationsQueue from "@/components/OperationsQueue";
 import CommandCenter from "@/components/CommandCenter";
+import BusinessImpact from "@/components/BusinessImpact";
 import { CasesProvider } from "@/lib/casesStore";
 import { Activity, LayoutDashboard, Shield, BarChart3 } from "lucide-react";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<"SIMULATOR" | "OPERATIONS" | "COMMAND_CENTER">("SIMULATOR");
+  const [activeTab, setActiveTab] = useState<"SIMULATOR" | "OPERATIONS" | "COMMAND_CENTER" | "BUSINESS_IMPACT">("SIMULATOR");
 
   return (
     <CasesProvider>
@@ -33,11 +34,18 @@ export default function Dashboard() {
           >
             <BarChart3 className="w-4 h-4" /> Risk Command Center
           </button>
+          <button 
+            onClick={() => setActiveTab("BUSINESS_IMPACT")}
+            className={`flex items-center gap-2 px-6 py-4 font-semibold text-sm transition-colors border-b-2 ${activeTab === 'BUSINESS_IMPACT' ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+          >
+            <Activity className="w-4 h-4" /> Business Impact & ROI
+          </button>
         </div>
 
         {activeTab === "SIMULATOR" && <IntelligenceDashboard onNavigateToOps={() => setActiveTab("OPERATIONS")} />}
         {activeTab === "OPERATIONS" && <OperationsQueue />}
         {activeTab === "COMMAND_CENTER" && <CommandCenter />}
+        {activeTab === "BUSINESS_IMPACT" && <BusinessImpact />}
       </div>
     </CasesProvider>
   );
