@@ -11,6 +11,8 @@ import KPICards from "./KPICards";
 import BehaviorInsights from "./BehaviorInsights";
 import NetworkGraph from "./NetworkGraph";
 import InvestigationDrawer from "./InvestigationDrawer";
+import ModelTransparency from "./ModelTransparency";
+import { fetchMetrics } from "@/lib/riskEngine";
 
 // Use the same presets
 const PRESETS = {
@@ -30,6 +32,7 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [metrics, setMetrics] = useState<any>(null);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +49,12 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
       }
       setIsLoading(false);
     };
+
+    const loadMetrics = async () => {
+      const data = await fetchMetrics();
+      if (active && data) setMetrics(data);
+    };
+    loadMetrics();
     
     // Add small debounce to avoid spamming the backend while dragging sliders
     const timeoutId = setTimeout(() => {
@@ -98,6 +107,10 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
           </div>
         </div>
       </div>
+
+      {!isOffline && metrics && (
+        <ModelTransparency metrics={metrics} modelVersion={riskOutput?.modelVersion} />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
         <div className="lg:col-span-8 space-y-6">
@@ -170,8 +183,8 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
           {isOffline && (
             <div className="p-6 bg-slate-100 border-2 border-slate-300 border-dashed rounded-xl flex flex-col items-center justify-center text-center space-y-4 shadow-inner">
               <div className="p-3 bg-white rounded-full"><ServerOff className="w-8 h-8 text-slate-400" /></div>
-              <h3 className="font-bold text-slate-800">AI INFERENCE SERVICE UNAVAILABLE</h3>
-              <p className="text-sm text-slate-500">Please start the local ML FastAPI service to evaluate risks via Python ML endpoints.</p>
+              <h3 className="font-bold text-slate-800">AI INFERENCE UNAVAILABLE</h3>
+              <p className="text-sm text-slate-500">Risk analysis requires the ML inference service.</p>
               <div className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded">DEMO FALLBACK — ML SERVICE OFFLINE</div>
             </div>
           )}
@@ -188,13 +201,13 @@ export default function IntelligenceDashboard({ onNavigateToOps }: { onNavigateT
                 </div>
                 
                 <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-sm font-medium text-slate-600">Behavior Anomaly</span>
-                  <span className="font-bold text-slate-800">{riskOutput.anomalyScore}%</span>
+                  <span className="text-sm font-medium text-slate-600">Behavior Anomaly Score</span>
+                  <span className="font-bold text-slate-800">{riskOutput.anomalyScore}/100</span>
                 </div>
 
                 <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-sm font-medium text-slate-600">Network Risk</span>
-                  <span className="font-bold text-slate-800">{riskOutput.networkRiskScore}%</span>
+                  <span className="text-sm font-medium text-slate-600">Network Risk Score</span>
+                  <span className="font-bold text-slate-800">{riskOutput.networkRiskScore}/100</span>
                 </div>
               </div>
 

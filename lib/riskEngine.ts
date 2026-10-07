@@ -17,6 +17,16 @@ export interface MLInferenceResult {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8005";
 
+export async function fetchMetrics(): Promise<any | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/metrics`, { method: 'GET' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    return null;
+  }
+}
+
 export async function checkMLServiceStatus(): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/health`, { method: 'GET' });

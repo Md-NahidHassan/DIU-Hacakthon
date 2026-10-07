@@ -9,7 +9,7 @@ export default function XAIFactors({ factors }: { factors: XAIFactor[] }) {
   return (
     <div className="w-full mt-6 text-left">
       <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
-        Why is this risky?
+        WHY DID AI FLAG THIS?
       </h3>
       <div className="space-y-3">
         {factors.map((factor, idx) => {

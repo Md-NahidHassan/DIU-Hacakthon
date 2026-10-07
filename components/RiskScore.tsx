@@ -28,7 +28,7 @@ export default function RiskScore({ score, level }: RiskScoreProps) {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Risk Score</div>
+      <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Final Risk Score</div>
       
       <div className="relative flex items-center justify-center">
         <svg
@@ -61,7 +61,7 @@ export default function RiskScore({ score, level }: RiskScoreProps) {
           />
         </svg>
         <div className="absolute flex flex-col items-center justify-center">
-          <span className="text-4xl font-bold text-slate-800">{Math.round(score)}%</span>
+          <span className="text-2xl font-bold text-slate-800">{Math.round(score)}<span className="text-sm text-slate-500">/100</span></span>
         </div>
       </div>
       
